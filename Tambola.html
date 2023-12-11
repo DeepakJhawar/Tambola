@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number Matrix Generator</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+      h1 {
+        text-align: center;
+      }
+      #randomNumber {
+        font-size: 50px;
+        display: flex;
+        justify-content: center;
+        justify-items: center;
+        margin-bottom: 20px;
+      }
+      #matrix {
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      #matrix td {
+        padding: 2px;
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+      #matrix td.current {
+        background-color: #ffff00;
+      }
+      #matrix td.visited {
+        background-color: #c1c1c1;
+      }
+      #generateButton,
+      #resetButton {
+        font-size: 16px;
+        padding: 10px;
+        cursor: pointer;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Tambola Game Numbers Generator</h1>
+    <p id="randomNumber" style="margin-top: 0;"></p>
+    <table id="matrix"></table>
+    <button id="generateButton">Next Number</button>
+    <button id="resetButton">Reset Game</button>
+
+    <script>
+      var visitedNumbers = {};
+
+      function shuffleArray(array) {
+        for (i = array.length - 1; i > 0; i--) {
+          j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function displayMatrix() {
+  var matrixDisplay = document.getElementById('matrix');
+  matrixDisplay.innerHTML = '';
+  var table = document.createElement('table');
+
+  for (i = 0; i < 9; i++) {
+    var row = document.createElement('tr');
+    for (j = 1; j <= 10; j++) {
+      var cell = document.createElement('td');
+      var number = i * 10 + j;
+      cell.textContent = (number < 10 ? '0' : '') + number;
+      if (currentIndex === 0) {
+        currentNumber = null;
+      }
+
+      cell.classList.remove('current');
+
+      if (visitedNumbers[number]) {
+        cell.classList.add('visited'); 
+      } else if (number === currentNumber) {
+        cell.classList.add('current'); 
+      }
+      row.appendChild(cell);
+    }
+    table.appendChild(row);
+  }
+  matrixDisplay.appendChild(table);
+}
+
+
+      var currentIndex = 0;
+      var randomNumberDisplay = document.getElementById("randomNumber");
+      var generateButton = document.getElementById("generateButton");
+      var resetButton = document.getElementById("resetButton");
+      var currentNumber;
+
+      function generateRandomNumber() {
+        if (currentIndex < numbers.length) {
+          currentNumber = numbers[currentIndex++];
+          randomNumberDisplay.textContent = currentNumber;
+
+          displayMatrix();
+
+          visitedNumbers[currentNumber] = true;
+          sessionStorage.setItem(
+            "visitedNumbers",
+            JSON.stringify(visitedNumbers)
+          );
+
+          if (currentIndex === numbers.length) {
+            generateButton.disabled = true;
+            randomNumberDisplay.textContent = "No more numbers!";
+          }
+        }
+      }
+
+      function resetMatrix() {
+        currentIndex = 0;
+        generateButton.disabled = false;
+        randomNumberDisplay.textContent = "";
+        visitedNumbers = {};
+        sessionStorage.removeItem("visitedNumbers");
+        shuffleArray(numbers);
+        displayMatrix();
+      }
+
+      var numbers = Array.from({ length: 90 }, (_, i) => i + 1);
+      displayMatrix();
+      shuffleArray(numbers);
+
+      generateButton.addEventListener("click", generateRandomNumber);
+      resetButton.addEventListener("click", resetMatrix);
+    </script>
+  </body>
+</html>
